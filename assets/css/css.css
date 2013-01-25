@@ -1,0 +1,46 @@
+@font-face {
+    font-family: 'anaheimregular';
+    src: url('../font/anaheim-regular-webfont.eot');
+    src: url('../font/anaheim-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/anaheim-regular-webfont.woff') format('woff'),
+         url('../font/anaheim-regular-webfont.ttf') format('truetype'),
+         url('../font/anaheim-regular-webfont.svg#anaheimregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body { font-family: 'anaheimregular'; margin: 1.3em 13%; font-size: 1.3em; color: #555; }
+
+h1 { color: #c00; margin: 0; padding-left: 0; text-indent: 0; font-size: 1.3em; }
+h1 a { color: #c00; border: none; background: none; margin-left: -0.26em; }
+h1 a.t span { font-size: 0.5em; }
+h2 { color: #c00; margin: 1em 0; line-height: 1.1em; font-size: 1.1em; }
+
+p { line-height: 1.4em; }
+
+img { padding: 1px; border: 1px solid #bbb; float: left; margin: 0.2em 1em 0 0; }
+
+strong { font-weight: bolder; color: #111; }
+
+ul { margin: 1em; padding: 0; }
+li { line-height: 1.4em; padding-bottom: 0.65em; list-style-type: none; }
+ul li:before { content: "\30FB "; }
+
+a { color: #333; text-decoration: none; border-bottom: 1px solid #aaa; background: #f5f5f5; padding: 0 0.26em; }
+a:hover { text-decoration: none; background: #dcdcdc; opacity: 1; }
+
+.t span { visibility: hidden; position: absolute; margin: -1em -1.3em 0 0; font-size: 0.6em; line-height: 1.6em; background: #fff; padding: 0em 0.3em; border: 1px solid #ddd; opacity: 0.8; }
+.hover span { visibility: visible; }
+
+a.local { }
+a.anchor { }
+a.external sup { opacity: 0.5; position: absolute; font-size: 0.7em; margin: -0.65em 0 0 -0.1em; }
+a:hover.external sup { opacity: 0.9em; }
+
+
+hr { border: none; border-top: 1px dashed #aaa; }
+sup { font-size: 0.5em; margin-left: 0.2em; }
+
+#c { font-size: 0.7em; }
+
+#update { color: #aaa; font-size: 0.7em; margin: 0; position: absolute; bottom: 3px; left: 3px; }

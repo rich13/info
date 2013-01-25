@@ -1,0 +1,7 @@
+.DS_Store
+_config.ini
+sync_config.ini
+work/
+content/remote
+tokens
+.info_sync.lock

@@ -1,0 +1,12 @@
+# - - - - - - - - - - - - -
+Options +FollowSymLinks
+RewriteEngine on
+
+# - - - - - - - - - - - - -
+# disable directory browsing
+Options All -Indexes
+
+# - - - - - - - - - - - - -
+RewriteRule !info_sync_lock_file|\.(png|gif|js|css|woff|ttf|svg|php)$ index.php
+
+# - - - - - - - - - - - - -

@@ -3,8 +3,6 @@
 # info
 # - - - - - - - - - - - - -
 
-//include("inc/cache_start.php");
-
 $local_path = "content/local/";
 $remote_path = "content/remote/";
 
@@ -182,23 +180,12 @@ if($pages){
 
 }
 
-
-# - - - - - - - - - - - - -
-# cache purge
-# 
-
-//if($page == "purge" || $page == "purge.md"){
-//	include("inc/purgecache.php");
-//}
-
 # - - - - - - - - - - - - -
 
 $start = file_get_contents($things["start"]);
 $end = file_get_contents($things["end"]);
 
 $header = str_replace("%%pages_list_link%%", $pages_list_link, $header);
-$footer = str_replace("%%footer_extra%%", $footer_extra, $footer);
-$footer_extra = "";
 
 # - - - - - - - - - - - - -
 
@@ -240,8 +227,6 @@ if($matches){
 	    $variables[] = substr(substr($variable[1], 0, -2), 2);
 	 }
 
-	//var_dump($variables); 
-
 	foreach($variables as $var){
 		if(!isset($config[$var])){
 			die("Missing config item: ".$var);
@@ -252,6 +237,5 @@ if($matches){
 }
 
 # - - - - - - - - - - - - -
-echo $output;
 
-//include("i/cache_end.php");
+echo $output;

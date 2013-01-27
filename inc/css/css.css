@@ -37,6 +37,7 @@ a.anchor { }
 a.external sup { opacity: 0.5; position: absolute; font-size: 0.7em; margin: -0.65em 0 0 -0.1em; }
 a:hover.external sup { opacity: 0.9em; }
 
+pre { white-space: pre-wrap; }
 
 hr { border: none; border-top: 1px dashed #aaa; }
 sup { font-size: 0.5em; margin-left: 0.2em; }

@@ -11,7 +11,7 @@ var r = {};
 // =================================================================
 //
 r.go = function(){
-	console.log("go");
+	console.log("info");
 
 	if($("body").hasClass("remote")){
 		info.update();
@@ -93,10 +93,11 @@ r.update = function() {
 $("body").append('<p id="update"></p>');
 
 console.log("updating...");
+
 $("#update").html("&hellip;");
 
 	r.check = $.get(
-    			".info_sync.lock"
+    			".sync.lock"
     		);
 	
 			r.check.fail(function(){
@@ -107,7 +108,7 @@ $("#update").html("&hellip;");
 				
 				if(response.responseText == "locked"){
 				
-					//console.log("locked!");
+					console.log("locked!");
 				
 				} else{
 
@@ -127,6 +128,12 @@ $("#update").html("&hellip;");
 
 						$("#update").html(update);
 
+						if(update == "-"){
+							console.log("no update");
+						} else {
+							console.log("updated");	
+						}
+						
 						if(update == "*"){
 							window.location.reload();
 						}

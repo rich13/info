@@ -7,6 +7,6 @@ RewriteEngine on
 Options All -Indexes
 
 # - - - - - - - - - - - - -
-RewriteRule !info_sync_lock_file|\.(png|gif|js|css|woff|ttf|svg|php)$ index.php
+RewriteRule !\.(png|gif|js|css|woff|ttf|svg|php|lock)$ index.php
 
 # - - - - - - - - - - - - -

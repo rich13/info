@@ -3,6 +3,8 @@
 # info
 # - - - - - - - - - - - - -
 
+//include("inc/cache_start.php");
+
 $local_path = "content/local/";
 $remote_path = "content/remote/";
 
@@ -10,12 +12,12 @@ if(!file_exists($local_path)){ die("No $local_path"); }
 
 # - - - - - - - - - - - - -
 
-$config_file = $local_path."_config.ini";
-$things_file = $local_path."_things.ini";
+$config_file = "inc/_config.ini";
+$things_file = "inc/_things.ini";
 
 # - - - - - - - - - - - - -
 
-$markdown_file = "inc/markdown.php";
+$markdown_file = "inc/ext/markdown.php";
 $markdown_disabled = false;
 
 # - - - - - - - - - - - - -
@@ -134,17 +136,11 @@ if(!file_exists($filepath)){
 $pages_list_link = '[&equiv;]('.$infopath.'pages?ptrt='.$page.' "All pages")';
 
 # - - - - - - - - - - - - -
-# debug mode
-
-if($page == "!" || $page == "!.md"){
-	$debug = true;
-	die("debug");
-}
-
-# - - - - - - - - - - - - -
 
 if($page == "pages" || $page == "pages.md"){
 	
+	$pages = true;
+
 	$pages_list_link = '[&minus;]('.$infopath.$ptrt.' "Back to '.$ptrt.'")';
 
 	$dir_iterator = new RecursiveDirectoryIterator($content_path);
@@ -154,12 +150,13 @@ if($page == "pages" || $page == "pages.md"){
 		$pagename = str_replace($content_path, "", $filename);
 		$pagename = str_replace(".md", "", $pagename);
 		
-		if(is_dir($filename)){ $pagename .= "/"; }
+		//if(is_dir($filename)){ $pagename .= "/"; }
 
 		if( $pagename[0] != "." &&
 			$pagename[0] != "_" &&
 			$pagename != "index" &&
 			$pagename != "404" &&
+			!is_dir($filename) &&
 			!strstr($pagename, "/.") &&
 			filesize($filename) != 0){
 
@@ -171,15 +168,28 @@ if($page == "pages" || $page == "pages.md"){
 
 # - - - - - - - - - - - - -
 
-if($pages_list){
+if($pages){
 
-	$content = $pages_list;
+	if($pages_list){
+		$content = $pages_list;
+	} else {
+		$content = "Nothing to see here.";
+	}
 
 } else {
 
 	$content = file_get_contents($filepath);	
 
 }
+
+
+# - - - - - - - - - - - - -
+# cache purge
+# 
+
+//if($page == "purge" || $page == "purge.md"){
+//	include("inc/purgecache.php");
+//}
 
 # - - - - - - - - - - - - -
 
@@ -242,5 +252,6 @@ if($matches){
 }
 
 # - - - - - - - - - - - - -
-
 echo $output;
+
+//include("i/cache_end.php");

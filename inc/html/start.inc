@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Language" content="en-GB" />	
 <meta name="viewport" content="width=device-width">
 
-<link href="%%info_path%%assets/css/css.css" rel="stylesheet" type="text/css" media="all" />
+<link href="%%info_path%%inc/css/css.css" rel="stylesheet" type="text/css" media="all" />
 %%extra_css%%
 <title>%%info_title%%</title>
 </head>

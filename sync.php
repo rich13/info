@@ -8,11 +8,11 @@ date_default_timezone_set("Europe/London");
 
 # - - - - - - - - - - - - -
 
-require_once("inc/DropPHP/DropboxClient.php");
+require_once("inc/ext/DropPHP/DropboxClient.php");
 
 # - - - - - - - - - - - - -
 
-$sync_config_file = "inc/sync_config.ini";
+$sync_config_file = "inc/_config.ini";
 
 if(!file_exists($sync_config_file)){ die("No sync config file"); }
 
@@ -23,7 +23,7 @@ $sync_config = parse_ini_file($sync_config_file);
 
 $cache_threshold = $sync_config["cache_threshold"];
 
-$lockfile = ".info_sync.lock";
+$lockfile = ".sync.lock";
 $now = time();
 $last_update = filemtime($lockfile);
 $age = $now - $last_update;

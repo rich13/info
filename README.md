@@ -2,6 +2,10 @@
 
 A really simple CMS.
 
+## Warning
+
+This is a hack. If you like it, please make it better... but keep it minimalist :-)
+
 ## Installation
 
 - Hasn't been tried from scratch yet

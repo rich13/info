@@ -3,6 +3,8 @@
 # info
 # - - - - - - - - - - - - -
 
+if(!file_exists(".htaccess")){ die("No .htaccess file"); }
+
 $local_path = "content/local/";
 $remote_path = "content/remote/";
 
@@ -10,19 +12,16 @@ if(!file_exists($local_path)){ die("No $local_path"); }
 
 # - - - - - - - - - - - - -
 
-$config_file = "inc/_config.ini";
-$things_file = "inc/_things.ini";
+$config_file = "inc/config/_config.ini";
+$things_file = "inc/config/_things.ini";
+
+if(!file_exists($config_file)){ die("No config file"); }
+if(!file_exists($things_file)){ die("No things file"); }
 
 # - - - - - - - - - - - - -
 
-$markdown_file = "inc/ext/markdown.php";
 $markdown_disabled = false;
-
-# - - - - - - - - - - - - -
-
-if(!file_exists(".htaccess")){ die("No .htaccess file: things will break"); }
-if(!file_exists($config_file)){ die("No default config file"); }
-if(!file_exists($things_file)){ die("No default things file"); }
+$markdown_file = "inc/ext/markdown.php";
 
 if(!file_exists($markdown_file)){
 	echo "No Markdown";
@@ -37,26 +36,29 @@ $config = parse_ini_file($config_file);
 $things = parse_ini_file($things_file);
 
 # - - - - - - - - - - - - -
+# inventory check
+
+foreach ($things as $name => $thing) {
+	if(!file_exists($thing)){
+		die("Problem: can't find ".$thing);
+	} else {
+		${$name} = file_get_contents($thing);
+	}
+}
+
+# - - - - - - - - - - - - -
 
 $remote_enabled = $config["info_remote_enabled"];
 
-if( $remote_enabled && !file_exists($remote_path)){
+if($remote_enabled && !file_exists($remote_path)){
 	mkdir($remote_path);
- }
+}
 
 # - - - - - - - - - - - - -
-# remote overrides local
+# remote/local
 
 if($remote_enabled){
-
-	if(file_exists($remote_path."_config.ini")){ $config_file = $remote_path."_config.ini"; }
-	if(file_exists($remote_path."_things.ini")){ $things_file = $remote_path."_things.ini"; }
-
-	$config = parse_ini_file($config_file);
-	$things = parse_ini_file($things_file);
-
 	$config["flags"] .= "remote";
-
 } else {
 	$config["flags"] .= "local";
 }
@@ -74,7 +76,6 @@ if(sizeof(glob($remote_path."*.md")) != 0 && $remote_enabled){
 # - - - - - - - - - - - - -
 
 $infopath = $config["info_path"];
-$infotitle = $config["info_title"];
 
 # - - - - - - - - - - - - -
 # extra css
@@ -83,17 +84,6 @@ if(file_exists($content_path."_css.css")){
 	$config["extra_css"] = '<link href="'.$infopath.$content_path.'_css.css" rel="stylesheet" type="text/css" media="all" />';
 } else {
 	$config["extra_css"] = "";
-}
-
-# - - - - - - - - - - - - -
-# inventory check
-
-foreach ($things as $name => $thing) {
-	if(!file_exists($thing)){
-		die("Problem: can't find ".$thing);
-	} else {
-		${$name} = file_get_contents($thing);
-	}
 }
 
 # - - - - - - - - - - - - -
@@ -106,6 +96,7 @@ $page = $exploded_page_ptrt[0];
 $ptrt = $exploded_page_ptrt[1];
 
 # - - - - - - - - - - - - -
+# allow for /
 
 if($page == ""){ $page = "index"; }
 if(is_dir($content_path.$page)){ 
@@ -113,6 +104,7 @@ if(is_dir($content_path.$page)){
 }
 
 # - - - - - - - - - - - - -
+# set $filepath and...
 # handle requests for .md files
 
 if(strstr($page, ".md")){
@@ -130,10 +122,9 @@ if(!file_exists($filepath)){
 }
 
 # - - - - - - - - - - - - -
+# /pages
 
 $pages_list_link = '[&equiv;]('.$infopath.'pages?ptrt='.$page.' "All pages")';
-
-# - - - - - - - - - - - - -
 
 if($page == "pages" || $page == "pages.md"){
 	
@@ -142,15 +133,16 @@ if($page == "pages" || $page == "pages.md"){
 	$pages_list_link = '[&minus;]('.$infopath.$ptrt.' "Back to '.$ptrt.'")';
 
 	$dir_iterator = new RecursiveDirectoryIterator($content_path);
-	$iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+	$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
-	foreach ($iterator as $filename) {
-		$pagename = str_replace($content_path, "", $filename);
-		$pagename = str_replace(".md", "", $pagename);
+	foreach ($dir_contents as $filename) {
+		$pagename = str_replace($content_path, "", $filename); // just filename
+		$pagename = str_replace(".md", "", $pagename); // no file ending
 		
-		//if(is_dir($filename)){ $pagename .= "/"; }
+		//if(is_dir($filename)){ $pagename .= "/"; } // needs work...
 
-		if( $pagename[0] != "." &&
+		if( // exclude unwanted files...
+			$pagename[0] != "." &&
 			$pagename[0] != "_" &&
 			$pagename != "index" &&
 			$pagename != "404" &&
@@ -165,6 +157,7 @@ if($page == "pages" || $page == "pages.md"){
 }
 
 # - - - - - - - - - - - - -
+# set $content
 
 if($pages){
 
@@ -181,13 +174,14 @@ if($pages){
 }
 
 # - - - - - - - - - - - - -
+# template parts
 
 $start = file_get_contents($things["start"]);
 $end = file_get_contents($things["end"]);
-
 $header = str_replace("%%pages_list_link%%", $pages_list_link, $header);
 
 # - - - - - - - - - - - - -
+# create $output
 
 $output = $start;
 
@@ -217,15 +211,18 @@ if(strstr($page, ".md") || $markdown_disabled){
 $output .= $end;
 
 # - - - - - - - - - - - - -
+# handle template replacements
+# e.g. %%something%%
 
 preg_match_all("/(\%\%(.*?)\%\%)/", $output, $matches, PREG_SET_ORDER);
+
 if($matches){
 	
 	$variables = array();
 
 	foreach ($matches as $variable) {
 	    $variables[] = substr(substr($variable[1], 0, -2), 2);
-	 }
+	}
 
 	foreach($variables as $var){
 		if(!isset($config[$var])){
@@ -237,5 +234,6 @@ if($matches){
 }
 
 # - - - - - - - - - - - - -
+# all done
 
 echo $output;

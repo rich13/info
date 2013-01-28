@@ -7,6 +7,6 @@ RewriteEngine on
 Options All -Indexes
 
 # - - - - - - - - - - - - -
-RewriteRule !\.(png|gif|js|css|woff|ttf|svg|php|lock)$ index.php
+RewriteRule !\.(png|gif|jpg|js|css|woff|ttf|svg|php|lock)$ index.php
 
 # - - - - - - - - - - - - -

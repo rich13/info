@@ -3,7 +3,6 @@
 # This is based on DropPHP sample
 # ...part of http://fabi.me/en/php-projects/dropphp-dropbox-api-client/
 
-
 date_default_timezone_set("Europe/London");
 
 # - - - - - - - - - - - - -
@@ -12,9 +11,9 @@ require_once("inc/ext/DropPHP/DropboxClient.php");
 
 # - - - - - - - - - - - - -
 
-$sync_config_file = "inc/_config.ini";
+$sync_config_file = "inc/config/_config.ini";
 
-if(!file_exists($sync_config_file)){ die("No sync config file"); }
+if(!file_exists($sync_config_file)){ die("No config file"); }
 
 $sync_config = parse_ini_file($sync_config_file);
 
@@ -24,18 +23,18 @@ $sync_config = parse_ini_file($sync_config_file);
 $cache_threshold = $sync_config["cache_threshold"];
 
 $lockfile = ".sync.lock";
+if(!file_exists($lockfile)){
+	unlock($lockfile);
+}
+
 $now = time();
 $last_update = filemtime($lockfile);
 $age = $now - $last_update;
 
-if($age < $cache_threshold){
-
+if($age < $cache_threshold){ // if time since last update is less than threshold
 	die("-"); // too young to die? nope.
-
 } else {
-
-	touch($lockfile); // reset and continue...
-
+	unlock($lockfile); // reset and continue...
 }
 
 # - - - - - - - - - - - - -
@@ -55,13 +54,12 @@ $dropbox = new DropboxClient(array(
 ),'en');
 
 # - - - - - - - - - - - - -
+# first try to load existing access token
 
-// first try to load existing access token
 $access_token = load_token("access");
 if(!empty($access_token)) {
 	$dropbox->SetAccessToken($access_token);
-}
-elseif(!empty($_GET['auth_callback'])) // are we coming from dropbox's auth page?
+} elseif(!empty($_GET['auth_callback'])) // are we coming from dropbox's auth page?
 {
 	// then load our previosly created request token
 	$request_token = load_token($_GET['oauth_token']);
@@ -74,8 +72,8 @@ elseif(!empty($_GET['auth_callback'])) // are we coming from dropbox's auth page
 }
 
 // checks if access token is required
-if(!$dropbox->IsAuthorized())
-{
+if(!$dropbox->IsAuthorized()){
+
 	// redirect user to dropbox auth page
 	$return_url = "http://".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME']."?auth_callback=1";
 	$auth_url = $dropbox->BuildAuthorizeUrl($return_url);

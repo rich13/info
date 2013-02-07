@@ -1,6 +1,10 @@
 .DS_Store
 _config.ini
 work/
-content/
+content/local
+content/remote
+content/cache
 tokens/
 .sync.lock
+*.sublime-project
+*.sublime-workspace

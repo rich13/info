@@ -21,7 +21,7 @@ $remote_config_file = $remote_path."_config.ini";
 
 $base_config = parse_ini_file($base_config_file);
 
-if(file_exists($config_file)){
+if(file_exists($local_config_file)){
 	$local_config = parse_ini_file($local_config_file);
 	$config = $local_config;
 } else {

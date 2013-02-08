@@ -1,12 +1,9 @@
 # - - - - - - - - - - - - -
 Options +FollowSymLinks
 RewriteEngine on
-
 # - - - - - - - - - - - - -
 # disable directory browsing
 Options All -Indexes
-
 # - - - - - - - - - - - - -
 RewriteRule !\.(png|gif|jpg|js|css|woff|ttf|svg|php|lock)$ index.php
-
 # - - - - - - - - - - - - -

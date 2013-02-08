@@ -32,7 +32,6 @@ if(file_exists($remote_config_file)){
 	$remote_config = parse_ini_file($remote_config_file);
 	$config = array_merge($config, $remote_config);
 }
-var_dump($config);
 
 # - - - - - - - - - - - - -
 

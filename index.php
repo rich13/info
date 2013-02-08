@@ -56,6 +56,12 @@ if($remote_enabled && !file_exists($remote_path)){
 }
 
 # - - - - - - - - - - - - -
+
+if(!file_exists($cache_path)){
+	mkdir($cache_path);
+}
+
+# - - - - - - - - - - - - -
 # remote/local
 
 if($remote_enabled){

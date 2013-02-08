@@ -8,19 +8,55 @@ var info = function(){
 
 var r = {};
 
+r.infopath = $("body").attr("path");
+
+r.syncpath = r.infopath+"sync.php";
+r.synclockpath = r.infopath+".sync.lock";
+
 // =================================================================
 //
 r.go = function(){
 	console.log("info");
 
 	if($("body").hasClass("remote")){
-		info.update();
+		info.check();
 	}
 
 	r.hoverlinks();
 	r.linktypes();
+	r.interhr();
+	//r.captions();
 };
 
+
+// =================================================================
+//
+r.captions = function(){
+
+this.imgs = $("img");
+	for (var i = 0; i < this.imgs.length; i++) {
+		$(this.imgs[i]).addClass("caption");
+		alt = $(this.imgs[i]).attr("alt");
+		console.log(alt);
+		$(this.imgs[i]).after("<p class=\"caption\">"+alt+"</p>");
+	};
+}
+
+// =================================================================
+//
+r.interhr = function(){
+	n = 1;
+	if($("#q").length != 0){ n = 2; }
+
+	this.hrs = $("hr");
+	if(this.hrs.length > 2){
+	
+		for (var i = n; i < (this.hrs.length)-1; i++) {
+			$(this.hrs[i]).addClass("inter");
+		};
+
+	}
+}
 
 // =================================================================
 //
@@ -88,35 +124,32 @@ r.linktypes = function(){
 
 // =================================================================
 //
-r.update = function() {
+r.check = function() {
 
 $("body").append('<p id="update"></p>');
 
-console.log("updating...");
+console.log("checking...");
 
 $("#update").html("&hellip;");
 
-	r.check = $.get(
-    			".sync.lock"
-    		);
+	r.check = $.get(r.synclockpath);
 	
 			r.check.fail(function(){
 				console.log("check failed")	
 			});
 	
 			r.check.complete(function(response){
-				
 				if(response.responseText == "locked"){
-				
 					console.log("locked!");
-				
-				} else{
+				} else {
+					console.log("checked");
+					r.update();
+				}
+			});
+}
 
-					//console.log("unlocked!");
-
-					r.request = $.get(
-		    			"sync.php"
-		    		);
+r.update = function(){
+	r.request = $.get(r.syncpath);
 			
 					r.request.fail(function(){
 						console.log("update failed")	
@@ -129,20 +162,18 @@ $("#update").html("&hellip;");
 						$("#update").html(update);
 
 						if(update == "-"){
-							console.log("no update");
-						} else {
-							console.log("updated");	
+							console.log("not updating");
+						} else if(update == "=") {
+							console.log("no update needed");	
 						}
 						
 						if(update == "*"){
+							console.log("updated");	
 							window.location.reload();
 						}
 						
 
 					});
-
-				}
-			});
 }
 
 // =================================================================

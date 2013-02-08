@@ -163,6 +163,7 @@ if($page == "pages" || $page == "pages.md"){
 		$pagename = str_replace(".md", "", $pagename); // no file ending
 		
 		$pagelink = $pagename; // allow for different link and name
+		$pagename = str_replace("-", " ", $pagename); // prettify filenames
 
 		if($query){
 			$pagelink = $pagelink."?q=".$query;

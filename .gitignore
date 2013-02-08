@@ -1,7 +1,6 @@
 .DS_Store
 _config.ini
 work/
-content/local
 content/remote
 content/cache
 tokens/

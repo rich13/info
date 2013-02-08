@@ -15,20 +15,24 @@ if(!file_exists($local_path)){ die("No $local_path"); }
 
 # - - - - - - - - - - - - -
 
-$config_file = "inc/config/_config.ini";
-if(!file_exists($config_file)){
-	$config_file = "inc/config/_empty_config.ini";
+$base_config_file = "inc/config/_empty_config.ini";
+$local_config_file = "inc/config/_config.ini";
+$remote_config_file = $remote_path."_config.ini";
+
+$base_config = parse_ini_file($base_config_file);
+
+if(file_exists($config_file)){
+	$local_config = parse_ini_file($local_config_file);
+	$config = $local_config;
+} else {
+	$config = $base_config;
 }
 
-$base_config = parse_ini_file($config_file);
-
-$remote_config_file = $remote_path."/_config.ini";
-$remote_config = array();
 if(file_exists($remote_config_file)){
 	$remote_config = parse_ini_file($remote_config_file);
+	$config = array_merge($config, $remote_config);
 }
-
-$config = array_merge($base_config, $remote_config);
+var_dump($config);
 
 # - - - - - - - - - - - - -
 

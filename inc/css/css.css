@@ -83,7 +83,7 @@ xhr.inter:after { content: "∞"; display: inline-block; position: relative; top
 
 form { width: 95%; margin: 0 auto; padding: 0; }
 form input { border: 1px solid #ddd; background: transparent; padding: 0.3em 0; margin: 0; font-size: 0.76em; font-family: 'anaheimregular'; }
-form input#search { width: 22%; }
+form input#search { width: 20%; }
 form input#q { border: 1px solid #ddd; width: 76%; text-indent: 0.3em; }
 
 /* = = = = = = = = = = = = = */

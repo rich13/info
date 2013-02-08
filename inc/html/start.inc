@@ -7,7 +7,6 @@
 <meta name="viewport" content="width=device-width" />
 
 <meta name="generator" content="Info v%%info_version%%" />
-<meta name="copyright" content="%%info_copyright%%" />
 
 <title>%%info_title%%</title>
 <meta name="author" content="%%info_author%%" />

@@ -96,7 +96,7 @@ $dropbox_sync_hash = "content/remote/.dropbox_sync_hash";
 
 if(!file_exists($dropbox_sync_hash)){
 	file_put_contents($dropbox_sync_hash, $hash);
-	$our_hash = 0;	
+	$our_hash = -1;	
 } else {
 	$our_hash = file_get_contents($dropbox_sync_hash);
 }
@@ -106,7 +106,7 @@ if(!file_exists($dropbox_sync_hash)){
 
 if($hash == $our_hash){
 	
-	$output = "=";
+	$output = "="; # no update needed
 
 } else {
 
@@ -114,15 +114,13 @@ if($hash == $our_hash){
 
 		die("!"); # abort! abort!
 	
-	} else {
+	} else { # there's an update
 		
 		lock($lockfile); # prevent clashes by locking
 
 		file_put_contents($dropbox_sync_hash, $hash);
 
 		$files = $dropbox->GetFiles($sync_directory, true);
-
-		//var_dump($files);
 
 	}
 }
@@ -154,14 +152,17 @@ if(!empty($files)){
 
 		if($is_dir){
 			$download = false;
-			// work out how to handle subdirectories
+			@mkdir($remote_filepath);
 		}
 
 		if($remote_mod < $db_mod &&
 			$download == true){
 			
 			$dropbox->DownloadFile($file, $remote_filepath);
-			//$output .= $sync_directory.$filepath."\n";
+			
+			//if($debug){
+				$output .= $sync_directory.$filepath."\n";
+			//}
 
 			$output = "*"; # report that we made changes
 		}

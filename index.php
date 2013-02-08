@@ -18,9 +18,9 @@ if(!file_exists($local_path)){ die("No $local_path"); }
 $config_file = "inc/config/_config.ini";
 if(!file_exists($config_file)){
 	$config_file = "inc/config/_empty_config.ini";
-} else {
-	$base_config = parse_ini_file($config_file);
 }
+
+$base_config = parse_ini_file($config_file);
 
 $remote_config_file = $remote_path."/_config.ini";
 $remote_config = array();

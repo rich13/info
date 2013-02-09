@@ -110,6 +110,10 @@ if(is_dir($content_path.$page)){
 }
 
 # - - - - - - - - - - - - -
+
+$config["page"] = $page;
+
+# - - - - - - - - - - - - -
 # get page from cache if there...
 
 $cachefile = $cache_path.md5($page).".html";
@@ -125,10 +129,23 @@ if(file_exists($cachefile) && ($age < $config["cache_threshold"])){
 # set $filepath and...
 # handle requests for .md files
 
+$mode = "normal";
+
+if(strstr($page, ".info")){
+	$mode = "info";
+	$page = str_replace(".info", "", $page);
+}
+
+if(strstr($page, ".json")){
+	$mode = "json";
+	$page = str_replace(".json", "", $page);
+}
+
+$filepath = $content_path.$page.".md";
+
 if(strstr($page, ".md")){
+	$mode = "md";
 	$filepath = $content_path.$page;
-} else {
-	$filepath = $content_path.$page.".md";
 }
 
 # - - - - - - - - - - - - -
@@ -169,7 +186,7 @@ if($page == "pages" || $page == "pages.md"){
 			$pagelink = $pagelink."?q=".$query;
 		}
 
-		if(is_dir($filename)){ $pagename .= "/"; } // directories end with /
+		if(is_dir($filename)){ $pagename .= " ⇢"; } // directories end with /
 
 		if( // do magic filter search...
 			preg_match_all("/$query/i", file_get_contents($filename), $matches) &&
@@ -177,7 +194,6 @@ if($page == "pages" || $page == "pages.md"){
 			// exclude unwanted files...
 			$pagename[0] != "." &&
 			$pagename[0] != "_" &&
-			$pagename != "index" &&
 			$pagename != "404" &&
 			$pagename != "img/" &&
 			!strstr($pagename, ".png") &&
@@ -355,5 +371,15 @@ file_put_contents($cachefile, $output);
 
 # - - - - - - - - - - - - -
 # all done
+
+if($mode == "json"){
+	
+	$output_array = array(
+		"path" 		=> $infopath.$page,
+		"content"   => $output
+		);
+	$output = json_encode($output_array);
+
+}
 
 echo $output;

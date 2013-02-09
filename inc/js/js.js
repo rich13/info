@@ -8,7 +8,7 @@ var info = function(){
 
 var r = {};
 
-r.infopath = $("body").attr("path");
+r.infopath = $("html").attr("id");
 
 r.syncpath = r.infopath+"sync.php";
 r.synclockpath = r.infopath+".sync.lock";
@@ -169,11 +169,36 @@ r.update = function(){
 						
 						if(update == "*"){
 							console.log("updated");	
+							
+							//r.reload(window.location.href);
 							window.location.reload();
 						}
 						
 
 					});
+}
+
+
+r.reload = function(page){
+	console.log("reload "+page);
+
+	r.page = $.get(page+".json");
+	
+			r.page.fail(function(){
+				console.log("failed")	
+			});
+	
+			r.page.complete(function(response){
+
+				var newpage = jQuery.parseJSON(response.responseText);
+
+				if(newpage.path == $(location).attr("pathname")){
+					$("html").html(newpage.content);
+				} else {
+					console.log("another page was updated...");
+				}
+
+			});
 }
 
 // =================================================================

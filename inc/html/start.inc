@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html id="%%path_insert%%">
 <head>
 <meta charset="utf-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-<meta http-equiv="Content-Language" content="en-GB" />	
 <meta name="viewport" content="width=device-width" />
 
 <meta name="generator" content="Info v%%info_version%%" />
@@ -14,4 +12,4 @@
 
 <link href="%%info_path%%inc/css/css.css" rel="stylesheet" type="text/css" media="all" />%%extra_css%%
 </head>
-<body class="%%flags%%" path="%%path_insert%%">
+<body id="%%page%%" class="%%flags%%">

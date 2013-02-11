@@ -5,5 +5,3 @@ content/remote
 content/cache
 tokens/
 .sync.lock
-*.sublime-project
-*.sublime-workspace

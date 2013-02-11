@@ -252,8 +252,14 @@ if($pages){
 
 $start = file_get_contents("inc/html/start.inc");
 $end = file_get_contents("inc/html/end.inc");
-$header = file_get_contents("inc/md/_header.md");
-$footer = file_get_contents("inc/md/_footer.md");
+$headerpath = "inc/md/_header.md";
+$footerpath = "inc/md/_footer.md";
+
+if(file_exists($remote_path."_header.md")){ $headerpath = $remote_path."_header.md"; }
+if(file_exists($remote_path."_footer.md")){ $footerpath = $remote_path."_footer.md"; }
+
+$header = file_get_contents($headerpath);
+$footer = file_get_contents($footerpath);
 
 $header = str_replace("%%pages_list_link%%", $pages_list_link, $header);
 

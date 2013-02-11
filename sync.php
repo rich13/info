@@ -32,7 +32,7 @@ $last_update = filemtime($lockfile);
 $age = $now - $last_update;
 
 if($age < $cache_threshold){ // if time since last update is less than threshold
-	die("-"); // too young to die? nope.
+	die("*"); // too young to die? nope.
 } else {
 	unlock($lockfile); // reset and continue...
 }
@@ -162,10 +162,10 @@ if(!empty($files)){
 			$dropbox->DownloadFile($file, $remote_filepath);
 			
 			//if($debug){
-				$output .= "+ ".$filepath."<br />";
+				//$output .= "+ ".$filepath."<br />";
 			//}
 
-			//$output = "*"; # report that we made changes
+			$output = "+"; # report that we made changes
 		}
 	}
 
@@ -176,7 +176,8 @@ if(!empty($files)){
 		$localfile = str_replace("content/remote/", "", $filename);
 		if(!in_array($localfile, $filecheck)){
 			if($localfile != ".dropbox_sync_hash"){
-				echo "- ".$localfile."<br/>";
+				//echo "- ".$localfile."<br/>";
+				$output = "-";
 				unlink("content/remote/".$localfile);
 			}
 		}

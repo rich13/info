@@ -161,7 +161,7 @@ r.update = function(){
 
 						$("#update").html(update);
 
-						if(update == "-"){
+						if(update == "*"){
 							console.log("not updating");
 						} else if(update == "!") {
 							$("#update").html('<a href="?a=unlock">!</a>');	
@@ -169,8 +169,8 @@ r.update = function(){
 							console.log("no update needed");	
 						}
 						
-						if(update == "*"){
-							console.log("updated");	
+						if(update == "-" || update == "+"){
+							console.log("updated: "+update);	
 							
 							//r.reload(window.location.href);
 							window.location.reload();

@@ -86,7 +86,11 @@ if(sizeof(glob($remote_path."*.md")) != 0 && $remote_enabled){
 # - - - - - - - - - - - - -
 # process the page request
 
-$page = htmlspecialchars(str_replace($infopath, "", $_SERVER["REQUEST_URI"]));
+if($infopath == "/"){
+	$page = htmlspecialchars($_SERVER["REQUEST_URI"]);	
+} else {
+	$page = htmlspecialchars(str_replace($infopath, "", $_SERVER["REQUEST_URI"]));
+}
 
 $exploded_page_ptrt = explode("?ptrt=", $page);
 $page = $exploded_page_ptrt[0];

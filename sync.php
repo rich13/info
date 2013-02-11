@@ -161,7 +161,7 @@ if(!empty($files)){
 			$dropbox->DownloadFile($file, $remote_filepath);
 			
 			//if($debug){
-				$output .= $sync_directory.$filepath."\n";
+			//	$output .= $sync_directory.$filepath."\n";
 			//}
 
 			$output = "*"; # report that we made changes

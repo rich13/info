@@ -104,7 +104,7 @@ if(!file_exists($dropbox_sync_hash)){
 # - - - - - - - - - - - - -
 # look to see if the hash has changed
 
-if($hash == $our_hash){
+if($hash == $our_hash && $_SERVER['QUERY_STRING'] != "override") {
 	
 	$output = "="; # no update needed
 
@@ -135,6 +135,7 @@ if(!empty($files)){
 
 		$filepath = str_replace($sync_directory, "", $file->path);
 		
+		$filecheck[] = $filepath;
 		//echo $filepath."<br />";
 
 		if($filepath[0] == "."){ $download = false; }
@@ -161,17 +162,29 @@ if(!empty($files)){
 			$dropbox->DownloadFile($file, $remote_filepath);
 			
 			//if($debug){
-			//	$output .= $sync_directory.$filepath."\n";
+				$output .= "+ ".$filepath."<br />";
 			//}
 
-			$output = "*"; # report that we made changes
+			//$output = "*"; # report that we made changes
+		}
+	}
+
+	$dir_iterator = new RecursiveDirectoryIterator("content/remote/");
+	$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+
+	foreach ($dir_contents as $filename) {
+		$localfile = str_replace("content/remote/", "", $filename);
+		if(!in_array($localfile, $filecheck)){
+			if($localfile != ".dropbox_sync_hash"){
+				echo "- ".$localfile."<br/>";
+				unlink("content/remote/".$localfile);
+			}
 		}
 	}
 
 	unlock($lockfile);
 
 }
-
 echo $output;
 
 # - - - - - - - - - - - - -

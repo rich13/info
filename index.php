@@ -166,13 +166,13 @@ if(!file_exists($filepath)){
 
 $pages_list_link = '[&#8801;]('.$infopath.'pages?ptrt='.$page.' "All pages")';
 
-if($page == "pages" || $page == "pages.md"){
+if(strstr($page, "pages")){
 	
 	$pages = true;
 
 	$pages_list_link = '[&#8722;]('.$infopath.$ptrt.' "Back to '.$ptrt.'")';
 
-	$dir_iterator = new RecursiveDirectoryIterator($content_path);
+	$dir_iterator = new RecursiveDirectoryIterator($content_path); // TODO: add subdir
 	$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
 	foreach ($dir_contents as $filename) {
@@ -199,7 +199,7 @@ if($page == "pages" || $page == "pages.md"){
 			!strstr($pagename, ".png") &&
 			!strstr($pagename, ".txt") &&
 			!strstr($pagename, "index") &&
-			!strstr($pagename, "/.") &&
+			//!strstr($pagename, "/") &&
 			filesize($filename) != 0){
 
 			//echo "<pre>";
@@ -252,6 +252,7 @@ if($pages){
 
 $start = file_get_contents("inc/html/start.inc");
 $end = file_get_contents("inc/html/end.inc");
+
 $headerpath = "inc/md/_header.md";
 $footerpath = "inc/md/_footer.md";
 

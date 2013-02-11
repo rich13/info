@@ -8,6 +8,10 @@
 	body { margin: 0.3em 3.9%; font-size: 1.3em; }
 	img { padding: 1px; margin: 0; border: 1px solid #ddd; width: 470px; height: auto; }
 
+    #pages ul { margin: 0; padding: 0.5em 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+    #pages ul li { margin: 0; padding: 0; list-style-type: none; }
+    #pages ul li:before { content: ""; }
+    #pages ul li a { display: block; padding: 0.5em; border-bottom: 1px solid #ddd; }
 }
 
 /*html { -webkit-text-size-adjust: none; }*/

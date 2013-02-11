@@ -164,7 +164,7 @@ r.update = function(){
 						if(update == "-"){
 							console.log("not updating");
 						} else if(update == "!") {
-							$("#update").html('<a href="?a=purge">!</a>');	
+							$("#update").html('<a href="?a=unlock">!</a>');	
 						} else if(update == "=") {
 							console.log("no update needed");	
 						}

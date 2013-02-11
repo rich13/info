@@ -383,3 +383,9 @@ if($mode == "json"){
 }
 
 echo $output;
+
+if($action == "purge"){
+	file_put_contents(".sync.lock", "unlocked");	
+	file_put_contents("content/remote/.dropbox_sync_hash", "");
+	echo "unlocked";
+}

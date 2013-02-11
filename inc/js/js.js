@@ -139,7 +139,7 @@ $("#update").html("&hellip;");
 			});
 	
 			r.check.complete(function(response){
-				if(response.responseText == "locked"){
+				if(response.responseText == "!"){
 					console.log("locked!");
 				} else {
 					console.log("checked");
@@ -163,6 +163,8 @@ r.update = function(){
 
 						if(update == "-"){
 							console.log("not updating");
+						} else if(update == "!") {
+							$("#update").html('<a href="?a=purge">!</a>');	
 						} else if(update == "=") {
 							console.log("no update needed");	
 						}

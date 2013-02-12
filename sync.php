@@ -138,7 +138,7 @@ if(!empty($files)){
 		$filecheck[] = $filepath;
 		//echo $filepath."<br />";
 
-		if($filepath[0] == "."){ $download = false; }
+		if($filepath[0] == "." || $filepath[0] == "-"){ $download = false; }
 
 		$is_dir = $file->is_dir;
 		$db_mod = strtotime($file->modified);

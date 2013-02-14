@@ -198,6 +198,7 @@ if(strstr($page, "pages")){
 			// exclude unwanted files...
 			$pagename[0] != "." &&
 			$pagename[0] != "_" &&
+			$pagename[0] != "-" &&
 			$pagename != "404" &&
 			$pagename != "img/" &&
 			!strstr($pagename, ".png") &&

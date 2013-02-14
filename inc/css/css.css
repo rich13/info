@@ -5,7 +5,7 @@
 @media screen and (max-width: 980px) { body { margin: 1.3em 13%; font-size: 1.3em; } }
 @media screen and (max-width: 650px) { body { margin: 1.3em 13%; font-size: 1.3em; } }
 @media screen and (max-width: 480px) {
-	body { margin: 0.3em 3.9%; font-size: 1.3em; }
+	body { margin: 0.6em 3.9%; font-size: 1.3em; }
 	img { padding: 1px; margin: 0; border: 1px solid #ddd; width: 470px; height: auto; }
 
     #pages ul { margin: 0; padding: 0.5em 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
@@ -45,7 +45,7 @@ strong { font-weight: bolder; color: #111; }
 
 /* = = = = = = = = = = = = = */
 
-img { padding: 1px; margin: 0; border: 1px solid #ddd; max-width: 100%; height: auto; width: auto\9; /* ie8 */ }
+img { padding: 1px; margin: 0; max-width: 100%; height: auto; width: auto\9; /* ie8 */ }
 p.caption { font-size: 0.65em; margin: 0 0 1em 0; }
 
 /* = = = = = = = = = = = = = */

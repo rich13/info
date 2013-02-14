@@ -21,8 +21,13 @@ if($page != "index"){
 	//$p = explode("/", $page); // then loop through to get breadcrumbs
 
 	$crumb = str_replace("/index", "", $page);
+	
+	if($crumb != "" && $crumb != "/"){
+		$header = str_replace("%%info_pagetitle%%", " > [".ucfirst($crumb)."](".$page.")", $header);
+	} else {
+		$header = str_replace("%%info_pagetitle%%", "", $header);
+	}
 
-	$header = str_replace("%%info_pagetitle%%", " > [".ucfirst($crumb)."](".$page.")", $header);
 	$start = str_replace("</title>", " > ".ucfirst($crumb)."</title>", $start);	
 
 } else {

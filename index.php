@@ -243,7 +243,9 @@ if($pages){
 		$content .= $pages_list;
 		
 	} else {
+
 		$content .= "Nothing to see here.";
+
 	}
 
 } else {
@@ -253,56 +255,12 @@ if($pages){
 }
 
 # - - - - - - - - - - - - -
-# template parts
 
-$start = file_get_contents("inc/html/start.inc");
-$end = file_get_contents("inc/html/end.inc");
-
-$headerpath = "inc/md/_header.md";
-$footerpath = "inc/md/_footer.md";
-
-if(file_exists($remote_path."_header.md")){ $headerpath = $remote_path."_header.md"; }
-if(file_exists($remote_path."_footer.md")){ $footerpath = $remote_path."_footer.md"; }
-
-$header = file_get_contents($headerpath);
-$footer = file_get_contents($footerpath);
-
-$header = str_replace("%%pages_list_link%%", $pages_list_link, $header);
-
-if($page != "index"){
-
-	//$p = explode("/", $page); // then loop through to get breadcrumbs
-
-	$crumb = str_replace("/index", "", $page);
-
-	$header = str_replace("%%info_pagetitle%%", " > [".ucfirst($crumb)."](".$page.")", $header);
-	$start = str_replace("</title>", " > ".ucfirst($crumb)."</title>", $start);	
-
-} else {
-	$header = str_replace("%%info_pagetitle%%", "", $header);	
-}
+include("inc/core/template_parts.php");
 
 # - - - - - - - - - - - - -
-# hiding tags
 
-$tag_pattern = "/(\+\+(.*?)\+\+)/";
-preg_match_all($tag_pattern, $content, $matches, PREG_SET_ORDER);
-
-if($matches){
-	
-	$tags = array();
-
-	foreach ($matches as $tag) {
-	    $tags[] = substr(substr($tag[1], 0, -2), 2);
-	}
-
-	foreach($tags as $tag){
-	    $tag_list .= $tag." ";
-	    $content = str_replace("++". $tag ."++", "", $content);
-	}
-
-	//$hidden_tag_list .= "\n\n<!-- ".$tag_list."-->\n\n";
-}
+include("inc/plugins/tags.php");
 
 # - - - - - - - - - - - - -
 # create $output
@@ -335,47 +293,13 @@ if(strstr($page, ".md") || $markdown_disabled){
 $output .= $end;
 
 # - - - - - - - - - - - - -
-# handle template replacements
-# e.g. %%something%%
 
-$config["info_link"] = '<a class="info_link" title="Info v'.$config["info_version"].'" href="http://richard.northover.info/info">Info</a>';
-
-preg_match_all("/(\%\%(.*?)\%\%)/", $output, $matches, PREG_SET_ORDER);
-
-if($matches){
-	
-	$variables = array();
-
-	foreach ($matches as $variable) {
-	    $variables[] = substr(substr($variable[1], 0, -2), 2);
-	}
-
-	foreach($variables as $var){
-		if(!isset($config[$var])){
-			die("Missing config item: ".$var);
-		}
-	    $rep = $config[$var];
-	    $output = str_replace("%%". $var ."%%", $rep, $output);
-	}
-}
+include("inc/core/template_vars.php");
 
 # - - - - - - - - - - - - -
-# image path rewrites
 
-$img_pattern = "/(\<img src=\"(.*?)\" \/\>)/";
-preg_match_all($img_pattern, $output, $matches, PREG_SET_ORDER);
-
-if($matches){
-	$imgs = array();
-
-	foreach ($matches as $imgs) {
-	    $imgs[] = $matches[2];
-	}
-	foreach($imgs as $img){
-	    $output = str_replace("<img src=\"".$img."\" />", "<img src=\"".$content_path.$img."\" />", $output);
-	}
-
-}
+include("inc/plugins/images.php");
+include("inc/plugins/handles.php");
 
 # - - - - - - - - - - - - -
 # cache
@@ -383,17 +307,12 @@ if($matches){
 file_put_contents($cachefile, $output);
 
 # - - - - - - - - - - - - -
-# json mode
 
-if($mode == "json"){
-	
-	$output_array = array(
-		"path" 		=> $infopath.$page,
-		"content"   => $output
-		);
-	$output = json_encode($output_array);
+include("inc/plugins/json.php");
 
-}
+# - - - - - - - - - - - - -
+
+include("inc/core/actions.php");
 
 # - - - - - - - - - - - - -
 # all done
@@ -401,20 +320,3 @@ if($mode == "json"){
 echo $output;
 
 # - - - - - - - - - - - - -
-# final actions
-
-if($action == "unlock"){
-	file_put_contents(".sync.lock", "unlocked");	
-	file_put_contents("content/remote/.dropbox_sync_hash", "");
-	echo "sync unlocked";
-}
-
-if($action == "purgecache"){
-	$files = glob($cache_path."*");
-	foreach($files as $file){
-  		if(is_file($file)){
-  			unlink($file); // delete file
-  		}
-	}
-	echo "cache purged";
-}

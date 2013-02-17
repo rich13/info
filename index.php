@@ -92,6 +92,9 @@ if($infopath == "/"){
 	$page = htmlspecialchars(str_replace($infopath, "", $_SERVER["REQUEST_URI"]));
 }
 
+# - - - - - - - - - - - - -
+# process querystring
+
 $exploded_page_ptrt = explode("?ptrt=", $page);
 $page = $exploded_page_ptrt[0];
 $ptrt = preg_quote($exploded_page_ptrt[1], '/');
@@ -111,6 +114,9 @@ if($page == ""){ $page = "index"; }
 
 if(is_dir($content_path.$page)){ 
 	$page = $page."/index";
+
+
+	
 }
 
 # - - - - - - - - - - - - -
@@ -131,7 +137,7 @@ if(file_exists($cachefile) && ($age < $config["cache_threshold"])){
 
 # - - - - - - - - - - - - -
 # set $filepath and...
-# handle requests for .md files
+# handle requests for special extensions
 
 $mode = "normal";
 
@@ -166,7 +172,7 @@ if(!file_exists($filepath)){
 }
 
 # - - - - - - - - - - - - -
-# /pages
+# standard /pages
 
 $pages_list_link = '[&#8801;]('.$infopath.'pages?ptrt='.$page.' "All pages")';
 
@@ -196,9 +202,9 @@ if(strstr($page, "pages")){
 			preg_match_all("/$query/i", file_get_contents($filename), $matches) &&
 
 			// exclude unwanted files...
-			$pagename[0] != "." &&
-			$pagename[0] != "_" &&
-			$pagename[0] != "-" &&
+			$pagelink[0] != "." &&
+			$pagelink[0] != "_" &&
+			$pagelink[0] != "-" &&
 			$pagename != "404" &&
 			$pagename != "img/" &&
 			!strstr($pagename, ".png") &&
@@ -304,7 +310,7 @@ include("inc/plugins/handles.php");
 # - - - - - - - - - - - - -
 # cache
 
-file_put_contents($cachefile, $output);
+@file_put_contents($cachefile, $output);
 
 # - - - - - - - - - - - - -
 

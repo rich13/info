@@ -24,11 +24,10 @@ if($page != "index"){
 	
 	if($crumb != "" && $crumb != "/"){
 		$header = str_replace("%%info_pagetitle%%", " > [".ucfirst($crumb)."](".$page.")", $header);
+		$start = str_replace("</title>", " > ".ucfirst($crumb)."</title>", $start);	
 	} else {
 		$header = str_replace("%%info_pagetitle%%", "", $header);
 	}
-
-	$start = str_replace("</title>", " > ".ucfirst($crumb)."</title>", $start);	
 
 } else {
 	$header = str_replace("%%info_pagetitle%%", "", $header);	

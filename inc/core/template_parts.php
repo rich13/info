@@ -35,7 +35,7 @@ if($page != "index"){
 	}
 
 	$header = str_replace("%%info_pagetitle%%", $trail, $header);
-	$start = str_replace("</title>", $titletrail, $start);
+	$start = str_replace("</title>", $titletrail."</title>", $start);
 
 
 } else {

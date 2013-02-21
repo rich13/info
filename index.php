@@ -114,9 +114,6 @@ if($page == ""){ $page = "index"; }
 
 if(is_dir($content_path.$page)){ 
 	$page = $page."/index";
-
-
-	
 }
 
 # - - - - - - - - - - - - -
@@ -218,7 +215,7 @@ if(strstr($page, "pages")){
 			//echo "</pre>";
 			//die();
 
-   				$pages_list .= "- [".$pagename."](".$pagelink.")\r";
+   			$pages_list .= "- [".$pagename."](".$pagelink.")\r";
 		
 		}
 	}
@@ -269,37 +266,8 @@ include("inc/core/template_parts.php");
 include("inc/plugins/tags.php");
 
 # - - - - - - - - - - - - -
-# create $output
 
-$output = $start;
-
-if(strstr($page, ".md") || $markdown_disabled){
-
-	if(!$markdown_disabled){
-		$config["md_switch"] = '<a href="'.$infopath.str_replace(".md", "", $page).'" title="View Markup">⇡</a>';
-	}
-	$output .= "<pre>";
-	$output .= $header."\n\n";
-	$output .= htmlspecialchars($content);
-	$output .= "\n\n".$footer;
-	$output .= "</pre>";
-
-} else {
-
-	if(!$markdown_disabled){
-		$config["md_switch"] = '<a href="'.$infopath.$page.'.md" title="View Markdown">⇣</a>';
-	}
-
-	$output .= markdown($header);
-	$output .= markdown($content);
-	$output .= markdown($footer);
-	$output .= $hidden_tag_list;
-}
-
-$output .= $end;
-
-# - - - - - - - - - - - - -
-
+include("inc/core/output.php");
 include("inc/core/template_vars.php");
 
 # - - - - - - - - - - - - -

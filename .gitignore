@@ -5,7 +5,3 @@ content/remote
 content/cache
 tokens/
 .sync.lock
-test/
-archive/
-info/
-blog/

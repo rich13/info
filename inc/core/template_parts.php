@@ -20,7 +20,6 @@ if($page != "index"){
 
 	$p = explode("/", $page); // then loop through to get breadcrumbs
 
-
 	foreach ($p as $n => $crumb) {
 
 		if($n==0){ $crumblink = $infopath.$p[0]; }
@@ -28,7 +27,7 @@ if($page != "index"){
 		if($n==2){ $crumblink = $infopath.$p[0]."/".$p[1]."/".$p[2]; }
 		if($n==3){ $crumblink = $infopath.$p[0]."/".$p[1]."/".$p[2]."/".$p[3]; }
 
-		if($crumb !="index"){
+		if($crumb != "index"){
 			$trail .= "> [".ucfirst($crumb)."](".$crumblink.")";
 			$titletrail .= " - ".ucfirst($crumb);
 		}

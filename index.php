@@ -110,9 +110,9 @@ $action = preg_quote($exploded_page_action[1], '/');
 # - - - - - - - - - - - - -
 # allow for /
 
-if($page == ""){ $page = "index"; }
+if($page == "" || $page == "/"){ $page = "index"; }
 
-if(is_dir($content_path.$page)){ 
+if($page != "index" && is_dir($content_path.$page)){
 	$page = $page."/index";
 }
 
@@ -202,6 +202,8 @@ if(strstr($page, "pages")){
 			$pagelink[0] != "." &&
 			$pagelink[0] != "_" &&
 			$pagelink[0] != "-" &&
+			$pagename != "." &&
+			$pagename != ".." &&
 			$pagename != "404" &&
 			$pagename != "img/" &&
 			!strstr($pagename, ".png") &&

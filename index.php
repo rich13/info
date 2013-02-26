@@ -36,14 +36,7 @@ if(file_exists($remote_config_file)){
 # - - - - - - - - - - - - -
 
 $markdown_disabled = false;
-$markdown_file = "inc/ext/markdown.php";
-
-if(!file_exists($markdown_file)){
-	echo "No Markdown";
-	$markdown_disabled = true;
-} else {
-	include $markdown_file;
-}
+include "inc/ext/markdown.php";
 
 # - - - - - - - - - - - - -
 
@@ -160,9 +153,9 @@ if(strstr($page, ".md")){
 
 if(!file_exists($filepath)){
 
-	if(strstr($filepath, "/index")){
-		die("we should show directory listing");
-	}
+	//if(strstr($filepath, "/index")){
+	//	die("we should show directory listing");
+	//}
 
 	$filepath = "inc/md/404.md";
 	if(!file_exists($filepath)){ die("Sorry, the 404 404'ed."); }

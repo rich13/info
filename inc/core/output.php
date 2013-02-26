@@ -4,6 +4,8 @@
 
 $output = $start;
 
+if($infopath == "/"){ $infopath = ""; }
+
 if(strstr($page, ".md") || $markdown_disabled){
 
 	if(!$markdown_disabled){

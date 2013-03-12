@@ -111,7 +111,7 @@ if($page != "index" && is_dir($content_path.$page)){
 
 # - - - - - - - - - - - - -
 
-$config["page"] = $page;
+$config["page"] = str_replace("/", "", $page);
 
 # - - - - - - - - - - - - -
 # get page from cache if there...

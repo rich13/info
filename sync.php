@@ -170,22 +170,15 @@ if(!empty($files)){
 	}
 
 	$dir_iterator = new RecursiveDirectoryIterator("content/remote/");
-	$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::CHILD_FIRST);
+	$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
-	foreach ($dir_contents as $filename){
+	foreach ($dir_contents as $filename) {
 		$localfile = str_replace("content/remote/", "", $filename);
 		if(!in_array($localfile, $filecheck)){
-			if($localfile != ".dropbox_sync_hash" &&
-			   $localfile != "." &&
-			   $localfile != ".."){
-				
+			if($localfile != ".dropbox_sync_hash"){
+				//echo "- ".$localfile."<br/>";
 				$output = "-";
-
-				if(is_dir("content/remote/".$localfile)){
-					rmdir_recursive("content/remote/".$localfile);
-				} else {
-					unlink("content/remote/".$localfile);
-				}
+				unlink("content/remote/".$localfile);
 			}
 		}
 	}
@@ -194,17 +187,6 @@ if(!empty($files)){
 
 }
 echo $output;
-
-# - - - - - - - - - - - - -
-#
-function rmdir_recursive($dir) {
-    foreach(scandir($dir) as $file) {
-        if ('.' === $file || '..' === $file) continue;
-        if (is_dir("$dir/$file")) rmdir_recursive("$dir/$file");
-        else unlink("$dir/$file");
-    }
-    rmdir($dir);
-}
 
 # - - - - - - - - - - - - -
 #

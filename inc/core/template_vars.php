@@ -4,7 +4,7 @@
 # e.g. %%something%%
 
 
-$config["info_link"] = '<a class="info_link" title="Info v'.$config["info_version"].'" href="http://richard.northover.info/info">Info</a>';
+$config["info_link"] = '<a class="info_link" title="Info v'.$config["info_version"].'" href="http://info.northover.info">Info</a>';
 
 # - - - - - - - - - - - - -
 
@@ -20,7 +20,7 @@ if($matches){
 
 	foreach($variables as $var){
 		if(!isset($config[$var])){
-			die("Missing config item: ".$var);
+			echo("<p>Missing config item: ".$var."</p>");
 		}
 	    $rep = $config[$var];
 	    $output = str_replace("%%". $var ."%%", $rep, $output);

@@ -1,9 +1,10 @@
 .DS_Store
 _config.ini
 work/
-content/remote
-content/cache
-tokens/
+content/remote/*
+content/cache/*
+content/trash/*
+tokens/*
 .sync.lock
 test/
 archive/

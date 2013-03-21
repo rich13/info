@@ -198,7 +198,7 @@ if(strstr($page, "pages")){
 			$pagename != "." &&
 			$pagename != ".." &&
 			$pagename != "404" &&
-			$pagename != "img/" &&
+			!strstr($pagename, "_img") &&
 			!strstr($pagename, ".png") &&
 			!strstr($pagename, ".txt") &&
 			!strstr($pagename, "index") &&

@@ -17,7 +17,7 @@ require_once(dirname(__FILE__)."/OAuthSimple.php");
 class DropboxClient {
 	
 	const API_URL = "https://api.dropbox.com/1/";
-	const API_CONTENT_URL = "http://api-content.dropbox.com/1/";
+	const API_CONTENT_URL = "https://api-content.dropbox.com/1/";
 	
 	const BUFFER_SIZE = 4096;
 	
@@ -165,7 +165,7 @@ class DropboxClient {
 		$content = (!empty($rev)) ? http_build_query(array('rev' => $rev),'','&') : null;
 		$context = $this->createRequestContext($url, "GET", $content);
 
-		$fh = fopen($dest_path, 'wb'); // write binary
+		$fh = @fopen($dest_path, 'wb'); // write binary
 		if($fh === false) {
 			@fclose($rh);
 			throw new DropboxException("Could not create file $dest_path !");
@@ -206,8 +206,8 @@ class DropboxClient {
 			fclose($fh);
 		}
 		
-		//if($meta->bytes != $bytes_loaded)
-		//	throw new DropboxException("Download size mismatch!");
+		if($meta->bytes != $bytes_loaded)
+			throw new DropboxException("Download size mismatch!");
 			
 		return $meta;
 	}

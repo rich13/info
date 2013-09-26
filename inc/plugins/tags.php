@@ -1,6 +1,9 @@
 <?
 # - - - - - - - - - - - - -
 # hiding tags
+# takes tags in the form:
+# "++word++"
+# and converts to comments which are found in searches, but not seen when rendered
 
 $tag_pattern = "/(\+\+(.*?)\+\+)/";
 preg_match_all($tag_pattern, $content, $matches, PREG_SET_ORDER);

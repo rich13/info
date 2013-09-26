@@ -85,7 +85,7 @@ if(!$dropbox->IsAuthorized()){
 # - - - - - - - - - - - - -
 # Get overall directory metadata
 
-$db_meta = $dropbox->GetMetadata($sync_directory);
+$db_meta = $dropbox->GetMetadata($sync_directory); // need to look into current subdir?
 if(!$db_meta){ die("Nothing coming back from Dropbox..."); }
 
 # - - - - - - - - - - - - -
@@ -103,8 +103,8 @@ if(!file_exists($dropbox_sync_hash)){
 
 # - - - - - - - - - - - - -
 # look to see if the hash has changed
-
-if($hash == $our_hash && $_SERVER['QUERY_STRING'] != "override") {
+# echo $hash."\r".$our_hash;
+if($hash === $our_hash) {
 	
 	$output = "="; # no update needed
 
@@ -162,7 +162,7 @@ if(!empty($files)){
 			$dropbox->DownloadFile($file, $remote_filepath);
 			
 			//if($debug){
-				//$output .= "+ ".$filepath."<br />";
+			//	$output .= "+ ".$filepath."<br />";
 			//}
 
 			$output = "+"; # report that we made changes
@@ -195,6 +195,10 @@ if(!empty($files)){
 }
 echo $output;
 
+
+
+
+# - - - - - - - - - - - - -
 # - - - - - - - - - - - - -
 #
 function rmdir_recursive($dir) {

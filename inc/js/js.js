@@ -162,8 +162,9 @@ r.update = function(){
 						$("#update").html(update);
 
 						if(update == "*"){
-							console.log("not updating");
+							console.log("not updating yet");
 						} else if(update == "!") {
+							console.log("locked...");
 							$("#update").html('<a href="?a=unlock">!</a>');	
 						} else if(update == "=") {
 							console.log("no update needed");	

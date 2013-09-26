@@ -2,7 +2,7 @@
 # - - - - - - - - - - - - -
 # twitter @handle rewrites
 
-$handle_pattern = "/@(.*?)( |\.|,)/";
+$handle_pattern = "/@(.*?)( |\.|,|\<)/";
 preg_match_all($handle_pattern, $output, $matches, PREG_SET_ORDER);
 
 if($matches){

@@ -7,7 +7,7 @@
  * 
  * @author     Fabian Schlieper <fabian@fabi.me>
  * @copyright  Fabian Schlieper 2012
- * @version    1.3
+ * @version    1.6
  * @license    See LICENSE
  *
  */
@@ -22,6 +22,8 @@ class DropboxClient {
 	const BUFFER_SIZE = 4096;
 	
 	const MAX_UPLOAD_CHUNK_SIZE = 150000000; // 150MB
+	
+	const UPLOAD_CHUNK_SIZE = 4000000; // 4MB
 
 	private $appParams;	
 	private $consumerToken;
@@ -49,14 +51,27 @@ class DropboxClient {
 		$this->useCurl = function_exists('curl_init');
 	}
 	
-	function SetUseCUrl($use_it)
+    /** 
+	 * Sets whether to use cURL if its available or PHP HTTP wrappers otherwise
+	 * 
+	 * @access public
+	 * @return boolean Whether to actually use cURL (always false if not installed)
+	 */	
+	public function SetUseCUrl($use_it)
 	{
-		$this->useCurl = $use_it && function_exists('curl_init');
+		return ($this->useCurl = $use_it && function_exists('curl_init'));
 	}
 	
 	// ##################################################
 	// Authorization
 	
+    /** 
+	 * Step 1 of authentication process. Retrieves a request token or returns a previously retrieved one.
+	 * 
+	 * @access public
+	 * @param boolean $get_new_token Optional (default false). Wether to retrieve a new request token.
+	 * @return array Request Token array.
+	 */
 	public function GetRequestToken($get_new_token=false)
 	{
 		if(!empty($this->requestToken) && !$get_new_token)
@@ -69,6 +84,27 @@ class DropboxClient {
 		return ($this->requestToken = array('t'=>$rt['oauth_token'], 's'=>$rt['oauth_token_secret']));
 	}
 	
+    /** 
+	 * Step 2. Returns a URL the user must be redirected to in order to connect the app to their Dropbox account
+	 * 
+	 * @access public
+	 * @param string $return_url URL users are redirected after authorization
+	 * @return string URL
+	 */
+	public function BuildAuthorizeUrl($return_url)
+	{
+		$rt = $this->GetRequestToken();		
+		if(empty($rt) || empty($rt['t'])) throw new DropboxException('Request Token Invalid ('.print_r($rt,true).').');
+		return "https://www.dropbox.com/1/oauth/authorize?oauth_token=".$rt['t']."&oauth_callback=".urlencode($return_url);
+	}
+	
+    /** 
+	 * Step 3. Acquires an access token. This is the final step of authentication.
+	 * 
+	 * @access public
+	 * @param array $request_token Optional. The previously retrieved request token. This parameter can only be skipped if the DropboxClient object has been (de)serialized.
+	 * @return array Access Token array.
+	 */
 	public function GetAccessToken($request_token = null)
 	{
 		if(!empty($this->accessToken)) return $this->accessToken;
@@ -83,23 +119,29 @@ class DropboxClient {
 		return ($this->accessToken = array('t'=>$at['oauth_token'], 's'=>$at['oauth_token_secret']));
 	}
 	
+    /** 
+	 * Sets a previously retrieved (and stored) access token.
+	 * 
+	 * @access public
+	 * @param string|object $token The Access Token
+	 * @return none
+	 */
 	public function SetAccessToken($token)
 	{
 		if(empty($token['t']) || empty($token['s'])) throw new DropboxException('Passed invalid access token.');
 			$this->accessToken = $token;
 	}	
 	
+    /** 
+	 * Checks if an access token has been set.
+	 * 
+	 * @access public
+	 * @return boolean Authorized or not
+	 */
 	public function IsAuthorized()
 	{
 		if(empty($this->accessToken)) return false;		
 		return true;
-	}
-	
-	public function BuildAuthorizeUrl($return_url)
-	{
-		$rt = $this->GetRequestToken();		
-		if(empty($rt) || empty($rt['t'])) throw new DropboxException('Request Token Invalid ('.print_r($rt,true).').');
-		return "https://www.dropbox.com/1/oauth/authorize?oauth_token=".$rt['t']."&oauth_callback=".urlencode($return_url);
 	}
 	
 	
@@ -161,9 +203,9 @@ class DropboxClient {
 		
 		if(empty($dest_path)) $dest_path = basename($dropbox_file);
 		
-		$url = $this->cleanUrl(self::API_CONTENT_URL."/files/$this->rootPath/$dropbox_file");
-		$content = (!empty($rev)) ? http_build_query(array('rev' => $rev),'','&') : null;
-		$context = $this->createRequestContext($url, "GET", $content);
+		$url = $this->cleanUrl(self::API_CONTENT_URL."/files/$this->rootPath/$dropbox_file")
+			. (!empty($rev) ? ('?'.http_build_query(array('rev' => $rev),'','&')) : '');
+		$context = $this->createRequestContext($url, "GET");
 
 		$fh = @fopen($dest_path, 'wb'); // write binary
 		if($fh === false) {
@@ -207,7 +249,7 @@ class DropboxClient {
 		}
 		
 		if($meta->bytes != $bytes_loaded)
-			throw new DropboxException("Download size mismatch!");
+			throw new DropboxException("Download size mismatch! (header:{$meta->bytes} vs actual:{$bytes_loaded}");
 			
 		return $meta;
 	}
@@ -222,26 +264,71 @@ class DropboxClient {
 	 */	
 	public function UploadFile($src_file, $dropbox_path='', $overwrite=true, $parent_rev=null)
 	{
-		if(filesize($src_file) > self::MAX_UPLOAD_CHUNK_SIZE)
-			throw new DropboxException("Cannot upload files larger than 150MB!");
-			
 		if(empty($dropbox_path)) $dropbox_path = basename($src_file);
 		elseif(is_object($dropbox_path) && !empty($dropbox_path->path)) $dropbox_path = $dropbox_path->path;
+		
+		$file_size = filesize($src_file);
+		
+		if($file_size > self::MAX_UPLOAD_CHUNK_SIZE)
+		{			
+			$fh = fopen($src_file,'rb');
+			if($fh === false)
+				throw new DropboxException();
+			
+			$upload_id = null;
+			$offset = 0;
+
+			
+			while(!feof($fh)) {				
+				$url = $this->cleanUrl(self::API_CONTENT_URL."/chunked_upload").'?'.http_build_query(compact('upload_id', 'offset'),'','&');
+				
+				if($this->useCurl) {				
+					$context = $this->createRequestContext($url, "PUT");
+					curl_setopt($context, CURLOPT_BINARYTRANSFER, true);
+					curl_setopt($context, CURLOPT_PUT, 1);
+					curl_setopt($context, CURLOPT_INFILE, $fh);			
+					$chunk_size = min(self::UPLOAD_CHUNK_SIZE, $file_size - $offset);
+					$offset += $chunk_size;			
+					curl_setopt($context, CURLOPT_INFILESIZE, $chunk_size);
+					$response = json_decode(self::execCurlAndClose($context));
+					
+					fseek($fh,$offset);
+					if($offset >= $file_size)
+						break;
+				} else {
+					$content = fread($fh, self::UPLOAD_CHUNK_SIZE);
+				
+					$context = $this->createRequestContext($url, "PUT", $content);
+					$offset += strlen($content);
+					unset($content);			
+					
+					$response = json_decode(file_get_contents($url, false, $context));
+				}
+				unset($context);
+				
+				if(empty($upload_id)) {
+					$upload_id = $response->upload_id;
+					if(empty($upload_id)) throw new DropboxException("Upload ID empty!");
+				}
+			}
+			
+			@fclose($fh);
+			
+			$this->useCurl = $prev_useCurl;
+				
+			return $this->apiCall("commit_chunked_upload/$this->rootPath/$dropbox_path", "POST", compact('overwrite','parent_rev','upload_id'), true);
+		}
 			
 		$query = http_build_query(array_merge(compact('overwrite', 'parent_rev'), array('locale' => $this->locale)),'','&');
 		$url = $this->cleanUrl(self::API_CONTENT_URL."/files_put/$this->rootPath/$dropbox_path")."?$query";
-		
-		$prev_useCurl = $this->useCurl;
-		$this->useCurl = false;
-		
+				
 		if($this->useCurl) {
-			throw new DropboxException("Upload does not work yet!");
 			$context = $this->createRequestContext($url, "PUT");
 			curl_setopt($context, CURLOPT_BINARYTRANSFER, true);
 			$fh = fopen($src_file, 'rb');
+			curl_setopt($context, CURLOPT_PUT, 1);
 			curl_setopt($context, CURLOPT_INFILE, $fh); // file pointer
 			curl_setopt($context, CURLOPT_INFILESIZE, filesize($src_file));
-			$context = $this->createRequestContext($url, "PUT", $content);
 			$meta = json_decode(self::execCurlAndClose($context));
 			fclose($fh);
 			return $meta;
@@ -252,17 +339,49 @@ class DropboxClient {
 				
 			$context = $this->createRequestContext($url, "PUT", $content);
 			
-			$this->useCurl = $prev_useCurl;
-			
 			return json_decode(file_get_contents($url, false, $context));
 		}
 	}
 	
+	/**
+	* Get thumbnail for a specified image
+	*
+	* @access public
+	* @param $dropbox_file string Path to the image
+	* @param $format string Image format of the thumbnail (jpeg or png)
+	* @param $size string Thumbnail size (xs, s, m, l, xl)
+	* @return mime/* Returns the thumbnail as binary image data
+	*/
+	public function GetThumbnail($dropbox_file, $size = 's', $format = 'jpeg', $echo = false)
+	{
+		if(is_object($dropbox_file) && !empty($dropbox_file->path)) $dropbox_file = $dropbox_file->path;
+		$url = $this->cleanUrl(self::API_CONTENT_URL."thumbnails/$this->rootPath/$dropbox_file")
+			. '?' . http_build_query(array('format' => $format, 'size' => $size),'','&');
+		$context = $this->createRequestContext($url, "GET");		
+		
+		if($this->useCurl) {
+			curl_setopt($context, CURLOPT_BINARYTRANSFER, true);
+			curl_setopt($context, CURLOPT_RETURNTRANSFER, true);
+		}
+		
+		$thumb = $this->useCurl ? self::execCurlAndClose($context) : file_get_contents($url, NULL, $context);
+
+		if($echo) {
+			header('Content-type: image/'.$format);
+			echo $thumb;
+			unset($thumb);
+			return;
+		}
+		
+		return $thumb;
+	}
 	
-	function GetLink($dropbox_file, $preview=true, $short=true)
+	
+	function GetLink($dropbox_file, $preview=true, $short=true, &$expires=null)
 	{
 		if(is_object($dropbox_file) && !empty($dropbox_file->path)) $dropbox_file = $dropbox_file->path;
 		$url = $this->apiCall(($preview?"shares":"media")."/$this->rootPath/$dropbox_file", "POST", array('locale' => null, 'short_url'=> $preview ? $short : null));
+		$expires = strtotime($url->expires);
 		return $url->url;
 	}
 	
@@ -271,11 +390,36 @@ class DropboxClient {
 		return $this->apiCall("delta", "POST", compact('cursor'));
 	}
 	
+	function GetRevisions($dropbox_file, $rev_limit=10)
+	{
+		if(is_object($dropbox_file) && !empty($dropbox_file->path)) $dropbox_file = $dropbox_file->path;
+		return $this->apiCall("revisions/$this->rootPath/$dropbox_file", "GET", compact('rev_limit'));
+	}
 	
-	function Copy($from_path, $to_path)
+	function Restore($dropbox_file, $rev)
+	{
+		if(is_object($dropbox_file) && !empty($dropbox_file->path)) $dropbox_file = $dropbox_file->path;
+		return $this->apiCall("restore/$this->rootPath/$dropbox_file", "POST", compact('rev'));
+	}
+	
+	function Search($path, $query, $file_limit=1000, $include_deleted=false)
+	{
+		return $this->apiCall("search/$this->rootPath/$path", "POST", compact('query','file_limit','include_deleted'));
+	}
+	
+	function GetCopyRef($dropbox_file, &$expires=null)
+	{
+		if(is_object($dropbox_file) && !empty($dropbox_file->path)) $dropbox_file = $dropbox_file->path;
+		$ref = $this->apiCall("copy_ref/$this->rootPath/$dropbox_file", "GET", array('locale' => null));
+		$expires = strtotime($ref->expires);
+		return $ref->copy_ref;
+	}
+	
+	
+	function Copy($from_path, $to_path, $copy_ref=false)
 	{
 		if(is_object($from_path) && !empty($from_path->path)) $from_path = $from_path->path;
-		return $this->apiCall("fileops/copy", "POST", array('root'=> $this->rootPath, 'from_path' => $from_path, 'to_path' => $to_path));
+		return $this->apiCall("fileops/copy", "POST", array('root'=> $this->rootPath, ($copy_ref ? 'from_copy_ref' : 'from_path') => $from_path, 'to_path' => $to_path));
 	}
 	
     /** 
@@ -381,11 +525,12 @@ class DropboxClient {
 		return $res;
 	}
 	
-	function createRequestContext($url, $method, &$content=null, $oauth_token=-1)
+	private function createRequestContext($url, $method, &$content=null, $oauth_token=-1)
 	{
 		if($oauth_token === -1)
 			$oauth_token = $this->accessToken;				 
 
+		$method = strtoupper($method);
 		$http_context = array('method'=>$method, 'header'=> '');
 		
 		$oauth = new OAuthSimple($this->consumerToken['t'],$this->consumerToken['s']);
@@ -399,28 +544,31 @@ class DropboxClient {
 		}
 		
 		if(!empty($content)) {
-			$post_vars = ($method == "POST" && preg_match("/^[a-z][a-z0-9_]*=/i", substr($content, 0, 32)));
+			$post_vars = ($method != "PUT" && preg_match("/^[a-z][a-z0-9_]*=/i", substr($content, 0, 32)));
 			$http_context['header'] .= "Content-Length: ".strlen($content)."\r\n";
 			$http_context['header'] .= "Content-Type: application/".($post_vars?"x-www-form-urlencoded":"octet-stream")."\r\n";			
 			$http_context['content'] =& $content;			
-			if($post_vars)
-				$oauth->setParameters($content);
+			if($method == "POST" && $post_vars)
+				$oauth->setParameters($content);			
 		} elseif($method == "POST") {
 			// make sure that content-length is always set when post request (otherwise some wrappers fail!)
 			$http_context['content'] = "";
 			$http_context['header'] .= "Content-Length: 0\r\n";
 		}
 		
-		// check for query vars in url and add them to oauth parameters
+
+		// check for query vars in url and add them to oauth parameters (and remove from path)
+		$path = $url;
 		$query = strrchr($url,'?');
 		if(!empty($query)) {
 			$oauth->setParameters(substr($query,1));
-			$url = substr($url, 0, -strlen($query));
+			$path = substr($url, 0, -strlen($query));
 		}
+		
 		
 		$signed = $oauth->sign(array(
 			'action' => $method,
-            'path'=> $url));
+            'path'=> $path));
 		//print_r($signed);	
 		
 		$http_context['header'] .= "Authorization: ".$signed['header']."\r\n";
@@ -428,7 +576,7 @@ class DropboxClient {
 		return $this->useCurl ? $this->createCurl($url, $http_context) : stream_context_create(array('http'=>$http_context));
 	}
 	
-	function authCall($path, $request_token=null)
+	private function authCall($path, $request_token=null)
 	{
 		$url = $this->cleanUrl(self::API_URL.$path);
 		$dummy = null;
@@ -441,15 +589,24 @@ class DropboxClient {
 	}
 	
 	
-	function apiCall($path, $method, $params=array())
+	private function apiCall($path, $method, $params=array(), $content_call=false)
 	{
-		$url = $this->cleanUrl(self::API_URL.$path);
+		$url = $this->cleanUrl(($content_call ? self::API_CONTENT_URL : self::API_URL).$path);
 		$content = http_build_query(array_merge(array('locale'=>$this->locale), $params),'','&');
+		
+		if($method == "GET") {
+			$url .= "?".$content;
+			$content = null;
+		}
+		
 		$context = $this->createRequestContext($url, $method, $content);
 		$json = $this->useCurl ? self::execCurlAndClose($context) : file_get_contents($url, false, $context);
 		//if($json === false)
 //			throw new DropboxException();
-		return json_decode($json);
+		$resp = json_decode($json);
+		if(!empty($resp->error))
+			throw new DropboxException($resp->error);
+		return $resp;		
 	}
 	
 

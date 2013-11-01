@@ -3,7 +3,7 @@ DropPHP Dropbox API Class
 
 DropPHP provides a simple interface for Dropbox's REST API to list, download and upload files.
 
-For authentication it uses OAuthSimple, HTTPS requests are made with PHP's built in stream wrapper. It does not require any special PHP libarys like PEAR, cURL or OAUTH.
+For authentication it uses OAuthSimple, HTTPS requests are made with PHP's built in stream wrapper. It does not require any special PHP librarys like PEAR, cURL or OAUTH.
 
 See sample.php for a basic demonstration.
 
@@ -11,6 +11,21 @@ Basic documentation can be found at http://fabi.me/en/php-projects/dropphp-dropb
 
 Changelog
 -------
+= 1.6 =
+* API_CONTENT_URL changed to https fixing the download size mismatch error
+* Fixed cURL upload
+* Fixed parameters for API GET requests (GetThumbnail, GetFiles ...)
+
+= 1.5 =
+* Added support for chunked uploads. Large files (>150MB) will automatically be uploaded in chunks.
+
+= 1.4 =
+* New API functions: GetThumbnail, GetRevisions, Restore, Search and GetCopyRef 
+* Added $expires output parameter to GetLink function
+* Added $copy_ref parameter to Copy function
+* Added documentation to some functions
+* Added new functions to sample.php
+
 = 1.3 =
 * cURL is used if installed, this fixes some issues with PHP HTTP wrapper using cURL
 * Fixed minor bugs

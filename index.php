@@ -10,6 +10,7 @@ if(!file_exists(".htaccess")){ die("No .htaccess file"); }
 $local_path = "content/local/";
 $remote_path = "content/remote/";
 $cache_path = "content/cache/";
+$trash_path = "content/trash/";
 
 if(!file_exists($local_path)){ die("No $local_path"); }
 
@@ -19,13 +20,11 @@ $base_config_file = "inc/config/_empty_config.ini";
 $local_config_file = "inc/config/_config.ini";
 $remote_config_file = $remote_path."_config.ini";
 
-$base_config = parse_ini_file($base_config_file);
-
 if(file_exists($local_config_file)){
 	$local_config = parse_ini_file($local_config_file);
 	$config = $local_config;
 } else {
-	$config = $base_config;
+	$config = parse_ini_file($base_config_file);
 }
 
 if(file_exists($remote_config_file)){
@@ -41,7 +40,7 @@ include "inc/ext/markdown.php";
 # - - - - - - - - - - - - -
 
 $infopath = $config["info_path"];
-$config["path_insert"] .= $infopath;
+$config["path_insert"] .= $infopath; // used in JS, via <html> tag
 
 # - - - - - - - - - - - - -
 
@@ -55,6 +54,10 @@ if($remote_enabled && !file_exists($remote_path)){
 
 if(!file_exists($cache_path)){
 	mkdir($cache_path);
+}
+
+if(!file_exists($trash_path)){
+	mkdir($trash_path);
 }
 
 # - - - - - - - - - - - - -
@@ -162,59 +165,8 @@ if(!file_exists($filepath)){
 }
 
 # - - - - - - - - - - - - -
-# standard /pages
 
-$pages_list_link = '[&#8801;]('.$infopath.'pages?ptrt='.$page.' "All pages")';
-
-if(strstr($page, "pages")){
-	
-	$pages = true;
-
-	$pages_list_link = '[&#8722;]('.$infopath.$ptrt.' "Back to '.$ptrt.'")';
-
-	$dir_iterator = new RecursiveDirectoryIterator($content_path); // TODO: add subdir
-	$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-
-	foreach ($dir_contents as $filename) {
-		$pagename = str_replace($content_path, "", $filename); // just filename
-		$pagename = str_replace(".md", "", $pagename); // no file ending
-		
-		$pagelink = $pagename; // allow for different link and name
-		$pagename = str_replace("-", " ", $pagename); // prettify filenames
-
-		if($query){
-			$pagelink = $pagelink."?q=".$query;
-		}
-
-		if(is_dir($filename)){ $pagename .= " ⇢"; } // directories end with /
-
-		if( // do magic filter search...
-			preg_match_all("/$query/i", file_get_contents($filename), $matches) &&
-
-			// exclude unwanted files...
-			$pagelink[0] != "." &&
-			$pagelink[0] != "_" &&
-			$pagelink[0] != "-" &&
-			$pagename != "." &&
-			$pagename != ".." &&
-			$pagename != "404" &&
-			!strstr($pagename, "_img") &&
-			!strstr($pagename, ".png") &&
-			!strstr($pagename, ".txt") &&
-			!strstr($pagename, "index") &&
-			//!strstr($pagename, "/") &&
-			filesize($filename) != 0){
-
-			//echo "<pre>";
-			//var_dump($matches);
-			//echo "</pre>";
-			//die();
-
-   			$pages_list .= "- [".$pagename."](".$pagelink.")\r";
-		
-		}
-	}
-}
+include("inc/core/pages.php");
 
 # - - - - - - - - - - - - -
 # extra css
@@ -228,15 +180,13 @@ if(file_exists($content_path."_css.css")){
 # - - - - - - - - - - - - -
 # set $content
 
-if($pages){
+if($pages){ // we are listing pages and/or searching
 
-	$content = file_get_contents("inc/html/search.inc");
+	$search_insert = file_get_contents("inc/html/search.inc");
+	$content = str_replace('value=""', 'value="'.htmlspecialchars($query).'"', $search_insert);
+
 
 	if($pages_list){
-
-		if($query){
-			$content .= "## Pages containing \"".$query."\"\n";
-		}
 
 		$content .= $pages_list;
 		
@@ -271,6 +221,12 @@ include("inc/plugins/images.php");
 include("inc/plugins/handles.php");
 
 # - - - - - - - - - - - - -
+
+#if($query){
+#	include("inc/core/result_highlighter.php");
+#}
+
+# - - - - - - - - - - - - -
 # cache
 
 @file_put_contents($cachefile, $output);
@@ -285,7 +241,6 @@ include("inc/core/actions.php");
 
 # - - - - - - - - - - - - -
 # all done
-
 echo $output;
 
 # - - - - - - - - - - - - -

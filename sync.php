@@ -161,9 +161,9 @@ if(!empty($files)){
 			
 			$dropbox->DownloadFile($file, $remote_filepath);
 			
-			//if($debug){
-			//	$output .= "+ ".$filepath."<br />";
-			//}
+			if($debug){
+				$output .= "+ ".$filepath."<br />";
+			}
 
 			$output = "+"; # report that we made changes
 		}
@@ -178,7 +178,9 @@ if(!empty($files)){
 			if($localfile != ".dropbox_sync_hash" &&
 				$localfile != "." &&
 				$localfile != ".."){
-				//echo "- ".$localfile."<br/>";
+				if($debug){
+					echo "- ".$localfile."<br/>";
+				}
 				$output = "-";
 				
 				$current = "content/remote/".$localfile;
@@ -222,7 +224,7 @@ function islocked($lockfile){
 # - - - - - - - - - - - - -
 #
 function unlock($lockfile){
-	if(!file_put_contents($lockfile, "unlocked")){
+	if(@!file_put_contents($lockfile, "unlocked")){
 		die("Problem: couldn't unlock");		
 	}
 }
@@ -230,7 +232,7 @@ function unlock($lockfile){
 # - - - - - - - - - - - - -
 #
 function lock($lockfile){
-	if(!file_put_contents($lockfile, "locked")){
+	if(@!file_put_contents($lockfile, "locked")){
 		die("Problem: couldn't lock");		
 	}
 }
@@ -238,14 +240,14 @@ function lock($lockfile){
 # - - - - - - - - - - - - -
 #
 function store_token($token, $name){
-	if(!file_put_contents("tokens/$name.token", serialize($token)))
+	if(@!file_put_contents("tokens/$name.token", serialize($token)))
 		die("Problem: couldn't store token");
 }
 
 # - - - - - - - - - - - - -
 #
 function load_token($name){
-	if(!file_exists("tokens/$name.token")) return null;
+	if(@!file_exists("tokens/$name.token")) return null;
 	return @unserialize(@file_get_contents("tokens/$name.token"));
 }
 

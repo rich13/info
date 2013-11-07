@@ -2,6 +2,8 @@
 # - - - - - - - - - - - - -
 # template parts
 
+$trail = $titletrail = "";
+
 // HTML document
 $start = file_get_contents("inc/html/start.inc");
 $end = file_get_contents("inc/html/end.inc");

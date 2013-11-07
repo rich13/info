@@ -3,6 +3,8 @@
 # info
 # - - - - - - - - - - - - -
 
+require_once("inc/ext/PhpConsole/PhpConsole.php");
+PhpConsole::start();
 date_default_timezone_set("Europe/London");
 
 if(!file_exists(".htaccess")){ die("No .htaccess file"); }

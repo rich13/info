@@ -2,6 +2,8 @@
 # - - - - - - - - - - - - -
 # standard /pages
 
+$pages_list = "";
+
 $pages_keyword = "contents";
 
 $pages_list_link = '[&#8801;]('.$infopath.$pages_keyword.'?ptrt='.$page.' "All pages")';
@@ -17,6 +19,8 @@ if(strstr($page, $pages_keyword)){
 
 	if($pages_subdir[0] != $pages_keyword){
 		$pages_subdir_path = $pages_subdir[0]."/";
+	} else {
+		$pages_subdir_path = "";
 	}
 
 	$pages_path = $content_path.$pages_subdir_path;

@@ -5,6 +5,7 @@
 
 require_once("inc/ext/PhpConsole/PhpConsole.php");
 PhpConsole::start();
+
 date_default_timezone_set("Europe/London");
 
 if(!file_exists(".htaccess")){ die("No .htaccess file"); }
@@ -42,7 +43,7 @@ include "inc/ext/markdown.php";
 # - - - - - - - - - - - - -
 
 $infopath = $config["info_path"];
-$config["path_insert"] .= $infopath; // used in JS, via <html> tag
+$config["path_insert"] = $infopath; // used in JS, via <html> tag
 
 # - - - - - - - - - - - - -
 
@@ -95,15 +96,15 @@ if($infopath == "/"){
 
 $exploded_page_ptrt = explode("?ptrt=", $page);
 $page = $exploded_page_ptrt[0];
-$ptrt = preg_quote($exploded_page_ptrt[1], '/');
+$ptrt = @preg_quote($exploded_page_ptrt[1], '/');
 
 $exploded_page_query = explode("?q=", $page);
 $page = $exploded_page_query[0];
-$query = preg_quote($exploded_page_query[1], '/');
+$query = @preg_quote($exploded_page_query[1], '/');
 
 $exploded_page_action = explode("?a=", $page);
 $page = $exploded_page_action[0];
-$action = preg_quote($exploded_page_action[1], '/');
+$action = @preg_quote($exploded_page_action[1], '/');
 
 # - - - - - - - - - - - - -
 # allow for /
@@ -182,7 +183,7 @@ if(file_exists($content_path."_css.css")){
 # - - - - - - - - - - - - -
 # set $content
 
-if($pages){ // we are listing pages and/or searching
+if(isset($pages)){ // we are listing pages and/or searching
 
 	$search_insert = file_get_contents("inc/html/search.inc");
 	$content = str_replace('value=""', 'value="'.htmlspecialchars($query).'"', $search_insert);

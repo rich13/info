@@ -5,6 +5,8 @@
 # "++word++"
 # and converts to comments which are found in searches, but not seen when rendered
 
+$hidden_tag_list = "";
+
 $tag_pattern = "/(\+\+(.*?)\+\+)/";
 preg_match_all($tag_pattern, $content, $matches, PREG_SET_ORDER);
 

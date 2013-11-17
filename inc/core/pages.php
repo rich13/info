@@ -25,12 +25,12 @@ if(strstr($page, $pages_keyword)){
 
 	$pages_path = $content_path.$pages_subdir_path;
 
+	//if($query){
 	//echo $pages_path;
 
-	if($query){
-		$dir_iterator = new RecursiveDirectoryIterator($pages_path); // TODO: add subdir
-		$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-	} else {
+	//	$dir_iterator = new RecursiveDirectoryIterator($pages_path); // TODO: add subdir
+	//	$dir_contents = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::CHILD_FIRST);
+	//} else {
 		$dir_contents = glob($pages_path."*");
 		sort($dir_contents);
 
@@ -39,7 +39,7 @@ if(strstr($page, $pages_keyword)){
 		unset($dir_contents[$key]);
 		$dir_contents = array_values($dir_contents);
 		array_unshift($dir_contents, $pages_path."index.md");
-	}
+	//}
 
 //echo("<pre>");
 //print_r($dir_contents);

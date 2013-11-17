@@ -225,9 +225,7 @@ include("inc/plugins/handles.php");
 
 # - - - - - - - - - - - - -
 
-#if($query){
-#	include("inc/core/result_highlighter.php");
-#}
+//include("inc/core/result_highlighter.php");
 
 # - - - - - - - - - - - - -
 # cache

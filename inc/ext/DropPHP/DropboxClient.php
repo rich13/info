@@ -248,8 +248,8 @@ class DropboxClient {
 			fclose($fh);
 		}
 		
-		if($meta->bytes != $bytes_loaded)
-			throw new DropboxException("Download size mismatch! (header:{$meta->bytes} vs actual:{$bytes_loaded}");
+		//if($meta->bytes != $bytes_loaded)
+		//	throw new DropboxException("Download size mismatch! (header:{$meta->bytes} vs actual:{$bytes_loaded}");
 			
 		return $meta;
 	}
